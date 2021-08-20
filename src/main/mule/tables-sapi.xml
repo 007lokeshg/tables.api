@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="48c0832f-8327-49de-b36d-f90c0503360f" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="cc2783f8-697b-4f2c-b1f5-9dba55ab39bf" file="config.yaml" />
+	<flow name="tables-sapiFlow" doc:id="58ed0e59-eac8-4751-8b37-c365b2379bb9" >
+		<http:listener doc:name="Listener" doc:id="dab4d0b4-e953-40b9-aff6-07ee0c6d1aa3" config-ref="HTTP_Listener_config" path="/table/{table}"/>
+		<set-variable value="#[attributes.queryParams.num1 default 1]" doc:name="minNum" variableName='minNum' />
+		<set-variable value="#[attributes.queryParams.num2 default 20]" doc:name="maxNum" variableName='maxNum' />
+		<set-variable value="#[attributes.uriParams.table default 1]" doc:name="table" doc:id="15d9c49b-4b3a-41c1-861f-785550afa09e" variableName="table"/>
+		<ee:transform doc:name="Transform Message" doc:id="9a487c4b-e463-41f4-9555-3c878cc59b19" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var a=vars.table as Number
+var b=[(vars.minNum as Number) to (vars.maxNum as Number)]
+---
+(b[0] map ((a ++ " x " ++ $) ++ " = " ++ a * $))
+//(b[0] map ((a ++" X " ++ $) ++ " = " ++ a * $))
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
