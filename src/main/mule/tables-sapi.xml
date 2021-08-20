@@ -26,5 +26,6 @@ var b=[(vars.minNum as Number) to (vars.maxNum as Number)]
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="cf483d0c-9e92-4fc3-8e53-f370c862d8eb" message="#[payload]"/>
 	</flow>
 </mule>
